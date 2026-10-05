@@ -43,9 +43,11 @@ class Configuration(
         await interaction.response.defer()
 
         interaction_guild = get_interaction_guild(interaction)
+        interaction_user = interaction.user
 
         await create_configuration(
             guild_id=interaction_guild.id,
+            interaction_user_id=interaction_user.id,
             host_role_id=host_role.id,
             participant_role_id=participant_role.id,
             game_channel_id=game_channel.id,
@@ -95,6 +97,7 @@ class Configuration(
         participant_role = interaction_guild.get_role(configuration.participant_role_id)
         game_channel = interaction_guild.get_channel(configuration.game_channel_id)
         results_channel = interaction_guild.get_channel(configuration.results_channel_id)
+        updated_by = interaction_guild.get_member(configuration.modified_by)
 
         embed = discord.Embed(
             title="Server Information",
@@ -121,6 +124,9 @@ class Configuration(
             value=results_channel.mention if results_channel else "*This channel has been deleted*",
             inline=False,
         )
+
+        if updated_by is not None:
+            embed.set_footer(icon_url=updated_by.display_avatar.url , text=f"Last updated by {updated_by.display_name} on {configuration.modified_at.strftime("%b %#d, %Y")}.")
 
         await interaction.followup.send(embed=embed)
 

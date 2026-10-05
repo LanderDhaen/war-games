@@ -24,7 +24,7 @@ class Guild(Table, tablename="guild", schema=None):
     )
 
 
-ID = "2026-10-05T18:26:55:192405"
+ID = "2026-10-05T19:44:51:643316"
 VERSION = "1.36.0"
 DESCRIPTION = "Initial migration"
 
@@ -139,6 +139,48 @@ async def forwards():
         params={
             "default": None,
             "null": True,
+            "primary_key": False,
+            "unique": False,
+            "index": False,
+            "index_method": IndexMethod.btree,
+            "choices": None,
+            "db_column_name": None,
+            "secret": False,
+        },
+        schema=None,
+    )
+
+    manager.add_column(
+        table_class_name="Configuration",
+        tablename="configuration",
+        column_name="created_by",
+        db_column_name="created_by",
+        column_class_name="BigInt",
+        column_class=BigInt,
+        params={
+            "default": 0,
+            "null": False,
+            "primary_key": False,
+            "unique": False,
+            "index": False,
+            "index_method": IndexMethod.btree,
+            "choices": None,
+            "db_column_name": None,
+            "secret": False,
+        },
+        schema=None,
+    )
+
+    manager.add_column(
+        table_class_name="Configuration",
+        tablename="configuration",
+        column_name="modified_by",
+        db_column_name="modified_by",
+        column_class_name="BigInt",
+        column_class=BigInt,
+        params={
+            "default": 0,
+            "null": False,
             "primary_key": False,
             "unique": False,
             "index": False,

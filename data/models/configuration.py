@@ -5,12 +5,12 @@ from piccolo.columns import (
 )
 from piccolo.table import Table
 
-from data.database import IdentityMixin, MetaMixin
-from data.models.base import IdentityModel, MetaModel
+from data.database import IdentityMixin, AuditMixin
+from data.models.base import IdentityModel, AuditModel
 from data.models.guild import Guild
 
 
-class Configuration(IdentityMixin, MetaMixin, Table):
+class Configuration(IdentityMixin, AuditMixin, Table):
     host_role_id = BigInt()
     participant_role_id = BigInt()
     game_channel_id = BigInt()
@@ -23,7 +23,7 @@ class Configuration(IdentityMixin, MetaMixin, Table):
     )
 
 
-class ConfigurationModel(IdentityModel, MetaModel):
+class ConfigurationModel(IdentityModel, AuditModel):
     host_role_id: int
     participant_role_id: int
     game_channel_id: int

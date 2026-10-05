@@ -7,18 +7,19 @@ from piccolo.columns import (
 from piccolo.columns.defaults.timestamptz import TimestamptzNow
 from piccolo.table import Table
 
-from data.database import MetaMixin
+from data.database import TimestampMixin
 
-from data.models.base import MetaModel
+from data.models.base import TimestampModel
 
 
-class Guild(MetaMixin, Table):
+
+class Guild(TimestampMixin, Table):
     guild_id = BigInt(primary_key=True)
     joined_at = Timestamptz(default=TimestamptzNow())
     left_at = Timestamptz(null=True, default=None)
 
 
-class GuildModel(MetaModel):
+class GuildModel(TimestampModel):
     guild_id: int
     joined_at: datetime
     left_at: datetime | None
