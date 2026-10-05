@@ -5,7 +5,6 @@ from errors.configuration import MissingConfiguration
 
 
 async def create_configuration(
-        
     guild_id: int,
     interaction_user_id: int,
     host_role_id: int,

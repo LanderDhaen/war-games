@@ -12,7 +12,6 @@ from data.database import TimestampMixin
 from data.models.base import TimestampModel
 
 
-
 class Guild(TimestampMixin, Table):
     guild_id = BigInt(primary_key=True)
     joined_at = Timestamptz(default=TimestamptzNow())

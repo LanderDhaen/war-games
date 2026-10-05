@@ -1,10 +1,15 @@
 import discord
 from discord import app_commands
+from discord.permissions import Permissions
 from discord.ext import commands
 
 from core.check import requires_admin
 from core.context import get_interaction_guild
+from core.util import GREEN_TICK, RED_CROSS, format_permissions
 from services.configuration import create_configuration, get_configuration
+
+REQUIRED_GAME_CHANNEL_PERMISSIONS = Permissions(view_channel=True, send_messages=True)
+REQUIRED_RESULTS_CHANNEL_PERMISSIONS = Permissions(view_channel=True, send_messages=True)
 
 
 class Configuration(
@@ -126,7 +131,108 @@ class Configuration(
         )
 
         if updated_by is not None:
-            embed.set_footer(icon_url=updated_by.display_avatar.url , text=f"Last updated by {updated_by.display_name} on {configuration.modified_at.strftime("%b %#d, %Y")}.")
+            embed.set_footer(
+                icon_url=updated_by.display_avatar.url,
+                text=f"Last updated by {updated_by.display_name} on {configuration.modified_at.strftime('%b %#d, %Y')}.",
+            )
+
+        await interaction.followup.send(embed=embed)
+
+    @app_commands.command(
+        name="debug", description="Display the server debug information for War Games."
+    )
+    @app_commands.default_permissions(administrator=True)
+    @app_commands.guild_only()
+    @requires_admin()
+    async def debug_configuration(self, interaction: discord.Interaction) -> None:
+
+        await interaction.response.defer()
+
+        interaction_guild = get_interaction_guild(interaction)
+        configuration = await get_configuration(interaction_guild.id)
+
+        embed = discord.Embed(
+            title="Debug Information",
+            description=f"The following debug information has been retrieved for **{interaction_guild.name}**:",
+            colour=discord.Colour.blue(),
+        )
+
+        host_role = interaction_guild.get_role(configuration.host_role_id)
+        participant_role = interaction_guild.get_role(configuration.participant_role_id)
+        game_channel = interaction_guild.get_channel(configuration.game_channel_id)
+        result_channel = interaction_guild.get_channel(configuration.results_channel_id)
+
+        embed = discord.Embed(
+            title="Debug Information",
+            description=f"The following debug information has been retrieved for **{interaction_guild.name}**:",
+            colour=discord.Colour.blue(),
+        )
+
+        embed.add_field(name="Server ID", value=f"{interaction_guild.id}", inline=False)
+
+        if host_role is None:
+            embed.add_field(
+                name="Host Role Permissions",
+                value=f"*This role has been deleted*",
+                inline=False,
+            )
+
+        else:
+            embed.add_field(
+                name=f"Host Role Permissions",
+                value=f"{GREEN_TICK if host_role.is_assignable() else RED_CROSS} Assignable",
+                inline=False,
+            )
+
+        if participant_role is None:
+            embed.add_field(
+                name="Participant Role Permissions",
+                value=f"*This role has been deleted*",
+                inline=False,
+            )
+
+        else:
+            embed.add_field(
+                name=f"Participant Role Permissions",
+                value=f"{GREEN_TICK if participant_role.is_assignable() else RED_CROSS} Assignable",
+                inline=False,
+            )
+
+        if game_channel is None:
+            embed.add_field(
+                name="Game Channel Permissions",
+                value=f"*This channel has been deleted*",
+                inline=False,
+            )
+
+        else:
+            game_channel_permissions = game_channel.permissions_for(interaction_guild.me)
+
+            embed.add_field(
+                name=f"Game Channel Permissions",
+                value=format_permissions(
+                    game_channel_permissions, REQUIRED_GAME_CHANNEL_PERMISSIONS
+                ),
+                inline=False,
+            )
+
+        if result_channel is None:
+            embed.add_field(
+                name="Results Channel Permissions",
+                value=f"*This channel has been deleted*",
+                inline=False,
+            )
+
+        else:
+            result_channel_permissions = result_channel.permissions_for(interaction_guild.me)
+
+            embed.add_field(
+                name=f"Results Channel Permissions",
+                value=format_permissions(
+                    result_channel_permissions, REQUIRED_RESULTS_CHANNEL_PERMISSIONS
+                ),
+                inline=False,
+            )
 
         await interaction.followup.send(embed=embed)
 
