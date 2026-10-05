@@ -3,7 +3,7 @@ from datetime import datetime
 from pydantic import BaseModel
 
 
-class IdModel(BaseModel):
+class IdentityModel(BaseModel):
     id: int
 
 

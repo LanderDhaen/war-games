@@ -17,6 +17,9 @@ class WarGamesBot(commands.Bot):
         intents.guilds = True
         super().__init__(command_prefix="!", intents=intents, tree_cls=WarGamesCommandTree)
 
+    async def setup_hook(self) -> None:
+        await self.load_extension("commands.configuration")
+
 
 class WarGamesCommandTree(app_commands.CommandTree):
     async def on_error(
