@@ -1,6 +1,7 @@
 from data.database import utc_now
-from data.models.configuration import Configuration
+from data.models.configuration import Configuration, ConfigurationModel
 from data.models.guild import Guild
+from errors.configuration import MissingConfiguration
 
 
 async def create_configuration(
@@ -35,3 +36,25 @@ async def create_configuration(
                 Configuration.results_channel_id,
             ],
         )
+
+
+async def get_configuration(guild_id: int) -> ConfigurationModel:
+    configuration = (
+        await Configuration.select(
+            Configuration.id,
+            Configuration.created_at,
+            Configuration.modified_at,
+            Configuration.host_role_id,
+            Configuration.participant_role_id,
+            Configuration.game_channel_id,
+            Configuration.results_channel_id,
+        )
+        .where(Configuration.guild == guild_id)
+        .output(nested=True)
+        .first()
+    )
+
+    if configuration is None:
+        raise MissingConfiguration()
+
+    return ConfigurationModel(**configuration)

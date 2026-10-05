@@ -4,7 +4,7 @@ from discord.ext import commands
 
 from core.check import requires_admin
 from core.context import get_interaction_guild
-from services.configuration import create_configuration
+from services.configuration import create_configuration, get_configuration
 
 
 class Configuration(
@@ -73,6 +73,52 @@ class Configuration(
         embed.add_field(
             name="The channel where game results will be posted.",
             value=results_channel.mention,
+            inline=False,
+        )
+
+        await interaction.followup.send(embed=embed)
+
+    @app_commands.command(
+        name="info", description="Display the server configuration for War Games."
+    )
+    @app_commands.default_permissions(administrator=True)
+    @app_commands.guild_only()
+    @requires_admin()
+    async def display_configuration(self, interaction: discord.Interaction) -> None:
+
+        await interaction.response.defer()
+
+        interaction_guild = get_interaction_guild(interaction)
+        configuration = await get_configuration(interaction_guild.id)
+
+        host_role = interaction_guild.get_role(configuration.host_role_id)
+        participant_role = interaction_guild.get_role(configuration.participant_role_id)
+        game_channel = interaction_guild.get_channel(configuration.game_channel_id)
+        results_channel = interaction_guild.get_channel(configuration.results_channel_id)
+
+        embed = discord.Embed(
+            title="Server Information",
+            description=f"The following settings have been saved in **{interaction_guild.name}**:",
+            colour=discord.Colour.blue(),
+        )
+        embed.add_field(
+            name="The role that will be assigned to hosts.",
+            value=host_role.mention if host_role else "*This role has been deleted*",
+            inline=False,
+        )
+        embed.add_field(
+            name="The role that will be assigned to participants.",
+            value=participant_role.mention if participant_role else "*This role has been deleted*",
+            inline=False,
+        )
+        embed.add_field(
+            name="The channel where games will be posted.",
+            value=game_channel.mention if game_channel else "*This channel has been deleted*",
+            inline=False,
+        )
+        embed.add_field(
+            name="The channel where game results will be posted.",
+            value=results_channel.mention if results_channel else "*This channel has been deleted*",
             inline=False,
         )
 
