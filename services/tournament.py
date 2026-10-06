@@ -7,7 +7,7 @@ from data.models.tournament import (
     TournamentConstraints,
     TournamentModel,
 )
-from errors.tournament import DuplicateTournamentName, InvalidTournamentTeamSize
+from errors.tournament import DuplicateTournamentName, InvalidTournamentTeamSize, MissingTournament
 
 
 async def create_tournament(
@@ -53,3 +53,26 @@ async def create_tournament(
                 raise
 
     return TournamentModel(**rows[0])
+
+async def get_tournament(guild_id: int, tournament_name: str) -> TournamentModel:
+    tournament = (
+        await Tournament.select(
+            Tournament.id,
+            Tournament.created_at,
+            Tournament.modified_at,
+            Tournament.created_by,
+            Tournament.modified_by,
+            Tournament.name,
+            Tournament.team_size,
+            Tournament.description,
+            Tournament.status,
+        )
+        .where((Tournament.guild == guild_id) & (Tournament.name == tournament_name))
+        .output(nested=True)
+        .first()
+    )
+
+    if not tournament:
+        raise MissingTournament(tournament_name=tournament_name)
+
+    return TournamentModel(**tournament)

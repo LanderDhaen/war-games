@@ -17,5 +17,17 @@ class DuplicateTournamentName(ExpectedError):
 class InvalidTournamentTeamSize(ExpectedError):
     """Raised when a tournament team size is invalid."""
 
-    title = "Invalid Tournament Team Size"
+    title = "Invalid Tournament"
     description = f"A tournament team size must be between {MIN_TEAM_SIZE} and {MAX_TEAM_SIZE}."
+
+
+class MissingTournament(ExpectedError):
+    """Raised when a tournament can't be found in the current server."""
+
+    title = "Missing Tournament"
+
+    def __init__(self, tournament_name: str):
+        self.description = (
+            f"A tournament with the name `{tournament_name}` doesn't exist in this server."
+        )
+        super().__init__()
