@@ -12,10 +12,14 @@ logger = logging.getLogger(__name__)
 class WarGamesBot(commands.Bot):
     def __init__(self):
         intents = discord.Intents.none()
+        intents.members = True
         intents.messages = True
         intents.message_content = True
         intents.guilds = True
         super().__init__(command_prefix="!", intents=intents, tree_cls=WarGamesCommandTree)
+
+    async def setup_hook(self) -> None:
+        await self.load_extension("commands.configuration")
 
 
 class WarGamesCommandTree(app_commands.CommandTree):
