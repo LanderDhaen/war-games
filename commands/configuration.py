@@ -139,23 +139,17 @@ class Configuration(
         await interaction.followup.send(embed=embed)
 
     @app_commands.command(
-        name="debug", description="Display the server debug information for War Games."
+        name="debug", description="Display the server debug for War Games."
     )
     @app_commands.default_permissions(administrator=True)
     @app_commands.guild_only()
     @requires_admin()
-    async def debug_configuration(self, interaction: discord.Interaction) -> None:
+    async def debug_server(self, interaction: discord.Interaction) -> None:
 
         await interaction.response.defer()
 
         interaction_guild = get_interaction_guild(interaction)
         configuration = await get_configuration(interaction_guild.id)
-
-        embed = discord.Embed(
-            title="Debug Information",
-            description=f"The following debug information has been retrieved for **{interaction_guild.name}**:",
-            colour=discord.Colour.blue(),
-        )
 
         host_role = interaction_guild.get_role(configuration.host_role_id)
         participant_role = interaction_guild.get_role(configuration.participant_role_id)
@@ -168,71 +162,32 @@ class Configuration(
             colour=discord.Colour.blue(),
         )
 
-        embed.add_field(name="Server ID", value=f"{interaction_guild.id}", inline=False)
+        embed.add_field(
+            name="Host Role Permissions",
+            value=f"{RED_CROSS} *This role has been deleted*" if host_role is None else f"{GREEN_TICK} {host_role.mention}\n\n {GREEN_TICK if host_role.is_assignable() else RED_CROSS} Assignable",
+            inline=False,
+        )
 
-        if host_role is None:
-            embed.add_field(
-                name="Host Role Permissions",
-                value=f"*This role has been deleted*",
-                inline=False,
-            )
+        embed.add_field(
+            name="Participant Role Permissions",
+            value=f"{RED_CROSS} *This role has been deleted*" if participant_role is None else f"{GREEN_TICK} {participant_role.mention}\n\n {GREEN_TICK if participant_role.is_assignable() else RED_CROSS} Assignable",
+            inline=False,
+        )
 
-        else:
-            embed.add_field(
-                name=f"Host Role Permissions",
-                value=f"{GREEN_TICK if host_role.is_assignable() else RED_CROSS} Assignable",
-                inline=False,
-            )
+        embed.add_field(
+            name="Game Channel Permissions",
+            value=f"{RED_CROSS} *This channel has been deleted*" if game_channel is None else f"{GREEN_TICK} {game_channel.mention}\n\n {format_permissions(game_channel.permissions_for(interaction_guild.me), REQUIRED_GAME_CHANNEL_PERMISSIONS)}",
+            inline=False,
+        )
 
-        if participant_role is None:
-            embed.add_field(
-                name="Participant Role Permissions",
-                value=f"*This role has been deleted*",
-                inline=False,
-            )
 
-        else:
-            embed.add_field(
-                name=f"Participant Role Permissions",
-                value=f"{GREEN_TICK if participant_role.is_assignable() else RED_CROSS} Assignable",
-                inline=False,
-            )
+        embed.add_field(
+            name="Results Channel Permissions",
+            value=f"{RED_CROSS} *This channel has been deleted*" if result_channel is None else f"{GREEN_TICK} {result_channel.mention}\n\n {format_permissions(result_channel.permissions_for(interaction_guild.me), REQUIRED_RESULTS_CHANNEL_PERMISSIONS)} ",
+            inline=False,
+        )
 
-        if game_channel is None:
-            embed.add_field(
-                name="Game Channel Permissions",
-                value=f"*This channel has been deleted*",
-                inline=False,
-            )
-
-        else:
-            game_channel_permissions = game_channel.permissions_for(interaction_guild.me)
-
-            embed.add_field(
-                name=f"Game Channel Permissions",
-                value=format_permissions(
-                    game_channel_permissions, REQUIRED_GAME_CHANNEL_PERMISSIONS
-                ),
-                inline=False,
-            )
-
-        if result_channel is None:
-            embed.add_field(
-                name="Results Channel Permissions",
-                value=f"*This channel has been deleted*",
-                inline=False,
-            )
-
-        else:
-            result_channel_permissions = result_channel.permissions_for(interaction_guild.me)
-
-            embed.add_field(
-                name=f"Results Channel Permissions",
-                value=format_permissions(
-                    result_channel_permissions, REQUIRED_RESULTS_CHANNEL_PERMISSIONS
-                ),
-                inline=False,
-            )
+        embed.set_footer(text=f"Server ID: {interaction_guild.id}")
 
         await interaction.followup.send(embed=embed)
 
