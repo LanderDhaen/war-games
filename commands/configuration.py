@@ -139,7 +139,7 @@ class Configuration(
         await interaction.followup.send(embed=embed)
 
     @app_commands.command(
-        name="debug", description="Display the server debug for War Games."
+        name="debug", description="Debug the server configuration for War Games."
     )
     @app_commands.default_permissions(administrator=True)
     @app_commands.guild_only()
@@ -157,7 +157,7 @@ class Configuration(
         result_channel = interaction_guild.get_channel(configuration.results_channel_id)
 
         embed = discord.Embed(
-            title="Debug Information",
+            title="Server Debug",
             description=f"The following debug information has been retrieved for **{interaction_guild.name}**:",
             colour=discord.Colour.blue(),
         )
