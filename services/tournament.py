@@ -76,3 +76,22 @@ async def get_tournament(guild_id: int, tournament_name: str) -> TournamentModel
         raise MissingTournament(tournament_name=tournament_name)
 
     return TournamentModel(**tournament)
+
+async def get_tournaments(guild_id: int) -> list[TournamentModel]:
+
+    tournaments = (
+        await Tournament.select(
+            Tournament.id,
+            Tournament.created_at,
+            Tournament.modified_at,
+            Tournament.created_by,
+            Tournament.modified_by,
+            Tournament.name,
+            Tournament.team_size,
+            Tournament.description,
+            Tournament.status,
+        )
+        .where(Tournament.guild == guild_id)
+    )
+
+    return [TournamentModel(**tournament) for tournament in tournaments]

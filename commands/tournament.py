@@ -4,6 +4,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
+from core.autocomplete import tournament_autocomplete
 from core.check import requires_host_role
 from core.context import get_interaction_guild
 from core.embed import build_tournament_embed
@@ -59,6 +60,7 @@ class Tournament(
     @app_commands.command(name="info", description="Display the information for a War Games tournament")
     @app_commands.describe(tournament_name="The name of the tournament.")
     @app_commands.rename(tournament_name="tournament")
+    @app_commands.autocomplete(tournament_name=tournament_autocomplete)
     @app_commands.guild_only()
     async def display_tournament(
         self,
