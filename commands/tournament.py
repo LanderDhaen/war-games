@@ -6,6 +6,7 @@ from discord.ext import commands
 
 from core.check import requires_host_role
 from core.context import get_interaction_guild
+from core.embed import build_tournament_embed
 from services.tournament import create_tournament, get_tournament
 from data.models.tournament import TournamentStatus
 
@@ -46,23 +47,12 @@ class Tournament(
             description=description,
         )
 
-        embed = discord.Embed(
+        embed = build_tournament_embed(
+            tournament,
             title="Tournament Scheduled",
             description=f"A new War Games tournament has been scheduled in **{interaction_guild.name}**",
             color=discord.Color.green(),
         )
-
-        embed.add_field(name="Name", value=tournament.name, inline=False)
-
-        embed.add_field(
-            name="Description",
-            value=description if description else "*This tournament has no description.*",
-            inline=False,
-        )
-
-        embed.add_field(name="Format", value=f"{tournament.team_size}v{tournament.team_size}", inline=False)
-
-        embed.add_field(name="Status", value=tournament.status, inline=False)
 
         await interaction.followup.send(embed=embed)
 
@@ -93,22 +83,15 @@ class Tournament(
                 verb = "was hosted"
 
             case _:
-                verb = "has an unknown status"
+                verb = "is hosted"
 
-        embed = discord.Embed(
+        embed = build_tournament_embed(
+            tournament,
             title="Tournament Information",
             description=f"The following War Games tournament {verb} in **{interaction_guild.name}**:",
-            colour=discord.Colour.blue(),
+            color=discord.Colour.blue(),
         )
-        embed.add_field(name="Name", value=tournament.name, inline=False)
-        embed.add_field(
-            name="Description",
-            value=tournament.description or "*This tournament has no description.*",
-            inline=False,
-        )
-        embed.add_field(name="Format", value=f"{tournament.team_size}v{tournament.team_size}", inline=False)
-        embed.add_field(name="Status", value=tournament.status, inline=False)
-
+       
         if updated_by is not None:
             embed.set_footer(icon_url=updated_by.display_avatar.url, text=f"Last updated by {updated_by.display_name} on {tournament.modified_at.strftime('%b %#d, %Y')}.")
 
