@@ -8,8 +8,8 @@ from core.autocomplete import tournament_autocomplete
 from core.check import requires_host_role
 from core.context import get_interaction_guild
 from core.embed import build_tournament_embed
-from services.tournament import create_tournament, get_tournament
-from data.models.tournament import TournamentStatus
+from services.tournament import create_tournament, get_tournament, get_tournaments
+from data.models.tournament import TournamentFilters, TournamentStatus
 
 
 class Tournament(
@@ -75,8 +75,8 @@ class Tournament(
         updated_by = interaction_guild.get_member(tournament.modified_by)
 
         match tournament.status:
-            case TournamentStatus.PENDING:
-                verb = "is scheduled" \
+            case TournamentStatus.SCHEDULED:
+                verb = "is scheduled"
             
             case TournamentStatus.ACTIVE:
                 verb = "is running"
@@ -100,6 +100,72 @@ class Tournament(
 
         await interaction.followup.send(embed=embed)
 
+    @app_commands.command(name="list", description="Display a list of War Games tournaments")
+    @app_commands.describe(tournament_status="The status of the tournaments to list.")
+    @app_commands.rename(tournament_status="status")
+    @app_commands.choices(
+    tournament_status=[
+        app_commands.Choice(
+            name=str(status),
+            value=status.value,
+        )
+        for status in TournamentStatus
+    ]
+)
+    @app_commands.guild_only()
+    async def list_tournaments(self, interaction: discord.Interaction, tournament_status: TournamentStatus) -> None:
+
+        await interaction.response.defer()
+
+        guild = get_interaction_guild(interaction)
+
+        filters = TournamentFilters(status=[tournament_status])
+
+        tournaments = await get_tournaments(guild.id, filters)
+
+        if not tournaments:
+
+            match tournament_status:
+                case TournamentStatus.SCHEDULED:
+                    verb = "scheduled"
+                case TournamentStatus.ACTIVE:
+                    verb = "running"
+                case TournamentStatus.FINISHED:
+                    verb = "finished"
+                case _:
+                    verb = "hosted"
+
+            embed_description = f"There are no {verb} War Games tournaments in **{guild.name}**."
+
+        else:
+
+            match tournament_status:
+                case TournamentStatus.SCHEDULED:
+                    verb = "are scheduled"
+                
+                case TournamentStatus.ACTIVE:
+                    verb = "are running"
+
+                case TournamentStatus.FINISHED:
+                    verb = "are finished"
+
+                case _:
+                    verb = "are hosted"
+
+            embed_description = f"The following War Games tournaments {verb} in **{guild.name}**:\n\n"
+            embed_description += "\n".join(
+                f"1. {tournament.name} • {tournament.team_size}v{tournament.team_size}"
+                for tournament in tournaments
+            )
+
+
+        embed = discord.Embed(
+            title="Tournament List",
+            description=embed_description,
+            color=discord.Color.blue(),
+        )
+
+        await interaction.followup.send(embed=embed)
 
 async def setup(bot: commands.Bot) -> None:
     await bot.add_cog(Tournament(bot))

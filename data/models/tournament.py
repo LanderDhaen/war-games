@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from enum import StrEnum, auto
 
 from piccolo.columns import ForeignKey, SmallInt, OnDelete, Text, Varchar
@@ -19,13 +20,12 @@ class TournamentConstraints(StrEnum):
 
 
 class TournamentStatus(StrEnum):
-    PENDING = auto()
+    SCHEDULED = auto()
     ACTIVE = auto()
     FINISHED = auto()
 
     def __str__(self) -> str:
         return self.value.title()
-
 
 class Tournament(IdentityMixin, AuditMixin, Table):
     name = Varchar(length=50)
@@ -33,7 +33,7 @@ class Tournament(IdentityMixin, AuditMixin, Table):
     team_size = SmallInt()
     status = Varchar(
         choices=TournamentStatus,
-        default=TournamentStatus.PENDING,
+        default=TournamentStatus.SCHEDULED,
     )
 
     guild = ForeignKey(references=Guild, null=False, on_delete=OnDelete.restrict)
@@ -52,3 +52,12 @@ class TournamentModel(IdentityModel, AuditModel):
     description: str | None
     team_size: int
     status: TournamentStatus
+
+
+@dataclass(slots=True)
+class TournamentFilters:
+    search: str | None = None
+    status: list[TournamentStatus] | None = None
+    limit: int | None = None
+    offset: int | None = None
+

@@ -5,7 +5,9 @@ from asyncpg import IntegrityConstraintViolationError
 from data.models.tournament import (
     Tournament,
     TournamentConstraints,
+    TournamentFilters,
     TournamentModel,
+    TournamentStatus,
 )
 from errors.tournament import DuplicateTournamentName, InvalidTournamentTeamSize, MissingTournament
 
@@ -77,10 +79,9 @@ async def get_tournament(guild_id: int, tournament_name: str) -> TournamentModel
 
     return TournamentModel(**tournament)
 
-async def get_tournaments(guild_id: int) -> list[TournamentModel]:
+async def get_tournaments(guild_id: int, filters: TournamentFilters) -> list[TournamentModel]:
 
-    tournaments = (
-        await Tournament.select(
+    query = Tournament.select(
             Tournament.id,
             Tournament.created_at,
             Tournament.modified_at,
@@ -90,8 +91,20 @@ async def get_tournaments(guild_id: int) -> list[TournamentModel]:
             Tournament.team_size,
             Tournament.description,
             Tournament.status,
-        )
-        .where(Tournament.guild == guild_id)
-    )
+        ).where(Tournament.guild == guild_id)
 
+    if filters.search:
+        query = query.where(Tournament.name.ilike(f"%{filters.search}%")).where(Tournament.description.ilike(f"%{filters.search}%"))
+    
+    if filters.status:
+        query = query.where(Tournament.status.is_in(filters.status))
+
+    if filters.limit:
+        query = query.limit(filters.limit)
+
+    if filters.offset:
+        query = query.offset(filters.offset)
+    
+    tournaments = await query
+       
     return [TournamentModel(**tournament) for tournament in tournaments]

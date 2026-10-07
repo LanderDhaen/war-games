@@ -29,7 +29,7 @@ class Guild(Table, tablename="guild", schema=None):
     )
 
 
-ID = "2026-10-06T22:26:40:420411"
+ID = "2026-10-07T17:53:48:661339"
 VERSION = "1.36.0"
 DESCRIPTION = "Initial migration"
 
@@ -37,6 +37,10 @@ DESCRIPTION = "Initial migration"
 async def forwards():
     manager = MigrationManager(
         migration_id=ID, app_name="war_games", description=DESCRIPTION
+    )
+
+    manager.add_table(
+        class_name="Tournament", tablename="tournament", schema=None, columns=None
     )
 
     manager.add_table(
@@ -50,8 +54,226 @@ async def forwards():
         columns=None,
     )
 
-    manager.add_table(
-        class_name="Tournament", tablename="tournament", schema=None, columns=None
+    manager.add_column(
+        table_class_name="Tournament",
+        tablename="tournament",
+        column_name="created_by",
+        db_column_name="created_by",
+        column_class_name="BigInt",
+        column_class=BigInt,
+        params={
+            "default": 0,
+            "null": False,
+            "primary_key": False,
+            "unique": False,
+            "index": False,
+            "index_method": IndexMethod.btree,
+            "choices": None,
+            "db_column_name": None,
+            "secret": False,
+        },
+        schema=None,
+    )
+
+    manager.add_column(
+        table_class_name="Tournament",
+        tablename="tournament",
+        column_name="modified_by",
+        db_column_name="modified_by",
+        column_class_name="BigInt",
+        column_class=BigInt,
+        params={
+            "default": 0,
+            "null": False,
+            "primary_key": False,
+            "unique": False,
+            "index": False,
+            "index_method": IndexMethod.btree,
+            "choices": None,
+            "db_column_name": None,
+            "secret": False,
+        },
+        schema=None,
+    )
+
+    manager.add_column(
+        table_class_name="Tournament",
+        tablename="tournament",
+        column_name="created_at",
+        db_column_name="created_at",
+        column_class_name="Timestamptz",
+        column_class=Timestamptz,
+        params={
+            "default": TimestamptzNow(),
+            "null": False,
+            "primary_key": False,
+            "unique": False,
+            "index": False,
+            "index_method": IndexMethod.btree,
+            "choices": None,
+            "db_column_name": None,
+            "secret": False,
+        },
+        schema=None,
+    )
+
+    manager.add_column(
+        table_class_name="Tournament",
+        tablename="tournament",
+        column_name="modified_at",
+        db_column_name="modified_at",
+        column_class_name="Timestamptz",
+        column_class=Timestamptz,
+        params={
+            "default": TimestamptzNow(),
+            "null": False,
+            "primary_key": False,
+            "unique": False,
+            "index": False,
+            "index_method": IndexMethod.btree,
+            "choices": None,
+            "db_column_name": None,
+            "secret": False,
+        },
+        schema=None,
+    )
+
+    manager.add_column(
+        table_class_name="Tournament",
+        tablename="tournament",
+        column_name="id",
+        db_column_name="id",
+        column_class_name="Serial",
+        column_class=Serial,
+        params={
+            "null": False,
+            "primary_key": True,
+            "unique": False,
+            "index": False,
+            "index_method": IndexMethod.btree,
+            "choices": None,
+            "db_column_name": None,
+            "secret": False,
+        },
+        schema=None,
+    )
+
+    manager.add_column(
+        table_class_name="Tournament",
+        tablename="tournament",
+        column_name="name",
+        db_column_name="name",
+        column_class_name="Varchar",
+        column_class=Varchar,
+        params={
+            "length": 50,
+            "default": "",
+            "null": False,
+            "primary_key": False,
+            "unique": False,
+            "index": False,
+            "index_method": IndexMethod.btree,
+            "choices": None,
+            "db_column_name": None,
+            "secret": False,
+        },
+        schema=None,
+    )
+
+    manager.add_column(
+        table_class_name="Tournament",
+        tablename="tournament",
+        column_name="description",
+        db_column_name="description",
+        column_class_name="Varchar",
+        column_class=Varchar,
+        params={
+            "length": 512,
+            "default": None,
+            "null": True,
+            "primary_key": False,
+            "unique": False,
+            "index": False,
+            "index_method": IndexMethod.btree,
+            "choices": None,
+            "db_column_name": None,
+            "secret": False,
+        },
+        schema=None,
+    )
+
+    manager.add_column(
+        table_class_name="Tournament",
+        tablename="tournament",
+        column_name="team_size",
+        db_column_name="team_size",
+        column_class_name="SmallInt",
+        column_class=SmallInt,
+        params={
+            "default": 0,
+            "null": False,
+            "primary_key": False,
+            "unique": False,
+            "index": False,
+            "index_method": IndexMethod.btree,
+            "choices": None,
+            "db_column_name": None,
+            "secret": False,
+        },
+        schema=None,
+    )
+
+    manager.add_column(
+        table_class_name="Tournament",
+        tablename="tournament",
+        column_name="status",
+        db_column_name="status",
+        column_class_name="Varchar",
+        column_class=Varchar,
+        params={
+            "length": 255,
+            "default": "scheduled",
+            "null": False,
+            "primary_key": False,
+            "unique": False,
+            "index": False,
+            "index_method": IndexMethod.btree,
+            "choices": Enum(
+                "TournamentStatus",
+                {
+                    "SCHEDULED": "scheduled",
+                    "ACTIVE": "active",
+                    "FINISHED": "finished",
+                },
+            ),
+            "db_column_name": None,
+            "secret": False,
+        },
+        schema=None,
+    )
+
+    manager.add_column(
+        table_class_name="Tournament",
+        tablename="tournament",
+        column_name="guild",
+        db_column_name="guild",
+        column_class_name="ForeignKey",
+        column_class=ForeignKey,
+        params={
+            "references": Guild,
+            "on_delete": OnDelete.restrict,
+            "on_update": OnUpdate.cascade,
+            "target_column": None,
+            "null": False,
+            "primary_key": False,
+            "unique": False,
+            "index": False,
+            "index_method": IndexMethod.btree,
+            "choices": None,
+            "db_column_name": None,
+            "secret": False,
+        },
+        schema=None,
     )
 
     manager.add_column(
@@ -362,228 +584,6 @@ async def forwards():
             "null": False,
             "primary_key": False,
             "unique": True,
-            "index": False,
-            "index_method": IndexMethod.btree,
-            "choices": None,
-            "db_column_name": None,
-            "secret": False,
-        },
-        schema=None,
-    )
-
-    manager.add_column(
-        table_class_name="Tournament",
-        tablename="tournament",
-        column_name="created_by",
-        db_column_name="created_by",
-        column_class_name="BigInt",
-        column_class=BigInt,
-        params={
-            "default": 0,
-            "null": False,
-            "primary_key": False,
-            "unique": False,
-            "index": False,
-            "index_method": IndexMethod.btree,
-            "choices": None,
-            "db_column_name": None,
-            "secret": False,
-        },
-        schema=None,
-    )
-
-    manager.add_column(
-        table_class_name="Tournament",
-        tablename="tournament",
-        column_name="modified_by",
-        db_column_name="modified_by",
-        column_class_name="BigInt",
-        column_class=BigInt,
-        params={
-            "default": 0,
-            "null": False,
-            "primary_key": False,
-            "unique": False,
-            "index": False,
-            "index_method": IndexMethod.btree,
-            "choices": None,
-            "db_column_name": None,
-            "secret": False,
-        },
-        schema=None,
-    )
-
-    manager.add_column(
-        table_class_name="Tournament",
-        tablename="tournament",
-        column_name="created_at",
-        db_column_name="created_at",
-        column_class_name="Timestamptz",
-        column_class=Timestamptz,
-        params={
-            "default": TimestamptzNow(),
-            "null": False,
-            "primary_key": False,
-            "unique": False,
-            "index": False,
-            "index_method": IndexMethod.btree,
-            "choices": None,
-            "db_column_name": None,
-            "secret": False,
-        },
-        schema=None,
-    )
-
-    manager.add_column(
-        table_class_name="Tournament",
-        tablename="tournament",
-        column_name="modified_at",
-        db_column_name="modified_at",
-        column_class_name="Timestamptz",
-        column_class=Timestamptz,
-        params={
-            "default": TimestamptzNow(),
-            "null": False,
-            "primary_key": False,
-            "unique": False,
-            "index": False,
-            "index_method": IndexMethod.btree,
-            "choices": None,
-            "db_column_name": None,
-            "secret": False,
-        },
-        schema=None,
-    )
-
-    manager.add_column(
-        table_class_name="Tournament",
-        tablename="tournament",
-        column_name="id",
-        db_column_name="id",
-        column_class_name="Serial",
-        column_class=Serial,
-        params={
-            "null": False,
-            "primary_key": True,
-            "unique": False,
-            "index": False,
-            "index_method": IndexMethod.btree,
-            "choices": None,
-            "db_column_name": None,
-            "secret": False,
-        },
-        schema=None,
-    )
-
-    manager.add_column(
-        table_class_name="Tournament",
-        tablename="tournament",
-        column_name="name",
-        db_column_name="name",
-        column_class_name="Varchar",
-        column_class=Varchar,
-        params={
-            "length": 50,
-            "default": "",
-            "null": False,
-            "primary_key": False,
-            "unique": False,
-            "index": False,
-            "index_method": IndexMethod.btree,
-            "choices": None,
-            "db_column_name": None,
-            "secret": False,
-        },
-        schema=None,
-    )
-
-    manager.add_column(
-        table_class_name="Tournament",
-        tablename="tournament",
-        column_name="description",
-        db_column_name="description",
-        column_class_name="Varchar",
-        column_class=Varchar,
-        params={
-            "length": 512,
-            "default": None,
-            "null": True,
-            "primary_key": False,
-            "unique": False,
-            "index": False,
-            "index_method": IndexMethod.btree,
-            "choices": None,
-            "db_column_name": None,
-            "secret": False,
-        },
-        schema=None,
-    )
-
-    manager.add_column(
-        table_class_name="Tournament",
-        tablename="tournament",
-        column_name="team_size",
-        db_column_name="team_size",
-        column_class_name="SmallInt",
-        column_class=SmallInt,
-        params={
-            "default": 0,
-            "null": False,
-            "primary_key": False,
-            "unique": False,
-            "index": False,
-            "index_method": IndexMethod.btree,
-            "choices": None,
-            "db_column_name": None,
-            "secret": False,
-        },
-        schema=None,
-    )
-
-    manager.add_column(
-        table_class_name="Tournament",
-        tablename="tournament",
-        column_name="status",
-        db_column_name="status",
-        column_class_name="Varchar",
-        column_class=Varchar,
-        params={
-            "length": 255,
-            "default": "pending",
-            "null": False,
-            "primary_key": False,
-            "unique": False,
-            "index": False,
-            "index_method": IndexMethod.btree,
-            "choices": Enum(
-                "TournamentStatus",
-                {
-                    "PENDING": "pending",
-                    "ACTIVE": "active",
-                    "FINISHED": "finished",
-                },
-            ),
-            "db_column_name": None,
-            "secret": False,
-        },
-        schema=None,
-    )
-
-    manager.add_column(
-        table_class_name="Tournament",
-        tablename="tournament",
-        column_name="guild",
-        db_column_name="guild",
-        column_class_name="ForeignKey",
-        column_class=ForeignKey,
-        params={
-            "references": Guild,
-            "on_delete": OnDelete.restrict,
-            "on_update": OnUpdate.cascade,
-            "target_column": None,
-            "null": False,
-            "primary_key": False,
-            "unique": False,
             "index": False,
             "index_method": IndexMethod.btree,
             "choices": None,
