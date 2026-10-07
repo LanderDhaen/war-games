@@ -2,7 +2,11 @@ import discord
 from discord import Member, app_commands
 
 from core.context import get_host_role, get_interaction_guild
-from errors.check import MissingAdministratorPermission, MissingHostRolePermission, MissingHostRolePermission
+from errors.check import (
+    MissingAdministratorPermission,
+    MissingHostRolePermission,
+    MissingHostRolePermission,
+)
 from services.configuration import get_configuration
 
 
@@ -13,6 +17,7 @@ def requires_admin():
         return True
 
     return app_commands.check(predicate)
+
 
 def requires_host_role():
     async def predicate(interaction: discord.Interaction) -> bool:
@@ -29,5 +34,5 @@ def requires_host_role():
             raise MissingHostRolePermission()
 
         return True
-    
+
     return app_commands.check(predicate)

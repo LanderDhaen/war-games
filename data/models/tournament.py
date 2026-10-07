@@ -27,6 +27,7 @@ class TournamentStatus(StrEnum):
     def __str__(self) -> str:
         return self.value.title()
 
+
 class Tournament(IdentityMixin, AuditMixin, Table):
     name = Varchar(length=50)
     description = Varchar(length=512, null=True, default=None)
@@ -60,4 +61,3 @@ class TournamentFilters:
     status: list[TournamentStatus] | None = None
     limit: int | None = None
     offset: int | None = None
-

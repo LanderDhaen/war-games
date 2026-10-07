@@ -15,6 +15,9 @@ async def tournament_autocomplete(interaction: Interaction, current: str):
     tournaments = await get_tournaments(interaction_guild.id, filters)
 
     return [
-        Choice(name=f"tournament.name • {tournament.team_size}v{tournament.team_size}", value=tournament.name)
+        Choice(
+            name=f"tournament.name • {tournament.team_size}v{tournament.team_size}",
+            value=tournament.name,
+        )
         for tournament in tournaments
     ]

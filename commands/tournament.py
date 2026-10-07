@@ -57,7 +57,9 @@ class Tournament(
 
         await interaction.followup.send(embed=embed)
 
-    @app_commands.command(name="info", description="Display the information for a War Games tournament")
+    @app_commands.command(
+        name="info", description="Display the information for a War Games tournament"
+    )
     @app_commands.describe(tournament_name="The name of the tournament.")
     @app_commands.rename(tournament_name="tournament")
     @app_commands.autocomplete(tournament_name=tournament_autocomplete)
@@ -74,29 +76,18 @@ class Tournament(
 
         updated_by = interaction_guild.get_member(tournament.modified_by)
 
-        match tournament.status:
-            case TournamentStatus.SCHEDULED:
-                verb = "is scheduled"
-            
-            case TournamentStatus.ACTIVE:
-                verb = "is running"
-
-            case TournamentStatus.FINISHED:
-                verb = "was hosted"
-
-            case _:
-                verb = "is hosted"
-
         embed = build_tournament_embed(
             tournament,
             title="Tournament Information",
-            description=f"The following War Games tournament {verb} in **{interaction_guild.name}**:",
+            description=f"The following War Games tournament is {tournament.status.value} in **{interaction_guild.name}**:",
             color=discord.Colour.blue(),
         )
-       
-        if updated_by is not None:
-            embed.set_footer(icon_url=updated_by.display_avatar.url, text=f"Last updated by {updated_by.display_name} on {tournament.modified_at.strftime('%b %#d, %Y')}.")
 
+        if updated_by is not None:
+            embed.set_footer(
+                icon_url=updated_by.display_avatar.url,
+                text=f"Last updated by {updated_by.display_name} on {tournament.modified_at.strftime('%b %#d, %Y')}.",
+            )
 
         await interaction.followup.send(embed=embed)
 
@@ -104,16 +95,18 @@ class Tournament(
     @app_commands.describe(tournament_status="The status of the tournaments to list.")
     @app_commands.rename(tournament_status="status")
     @app_commands.choices(
-    tournament_status=[
-        app_commands.Choice(
-            name=str(status),
-            value=status.value,
-        )
-        for status in TournamentStatus
-    ]
-)
+        tournament_status=[
+            app_commands.Choice(
+                name=str(status),
+                value=status.value,
+            )
+            for status in TournamentStatus
+        ]
+    )
     @app_commands.guild_only()
-    async def list_tournaments(self, interaction: discord.Interaction, tournament_status: TournamentStatus) -> None:
+    async def list_tournaments(
+        self, interaction: discord.Interaction, tournament_status: TournamentStatus
+    ) -> None:
 
         await interaction.response.defer()
 
@@ -124,40 +117,16 @@ class Tournament(
         tournaments = await get_tournaments(guild.id, filters)
 
         if not tournaments:
-
-            match tournament_status:
-                case TournamentStatus.SCHEDULED:
-                    verb = "scheduled"
-                case TournamentStatus.ACTIVE:
-                    verb = "running"
-                case TournamentStatus.FINISHED:
-                    verb = "finished"
-                case _:
-                    verb = "hosted"
-
-            embed_description = f"There are no {verb} War Games tournaments in **{guild.name}**."
+            embed_description = (
+                f"There are no {tournament_status.value} War Games tournaments in **{guild.name}**."
+            )
 
         else:
-
-            match tournament_status:
-                case TournamentStatus.SCHEDULED:
-                    verb = "are scheduled"
-                
-                case TournamentStatus.ACTIVE:
-                    verb = "are running"
-
-                case TournamentStatus.FINISHED:
-                    verb = "are finished"
-
-                case _:
-                    verb = "are hosted"
-
-            embed_description = f"The following War Games tournaments {verb} in **{guild.name}**:\n\n"
+            embed_description = f"The following War Games tournaments are {tournament_status.value} in **{guild.name}**:\n\n"
             embed_description += "\n".join(
                 f"1. {tournament.name} • {tournament.team_size}v{tournament.team_size}"
                 for tournament in tournaments
             )
-
 
         embed = discord.Embed(
             title="Tournament List",
@@ -166,6 +135,7 @@ class Tournament(
         )
 
         await interaction.followup.send(embed=embed)
+
 
 async def setup(bot: commands.Bot) -> None:
     await bot.add_cog(Tournament(bot))

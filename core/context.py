@@ -12,6 +12,7 @@ def get_interaction_guild(interaction: Interaction) -> Guild:
 
     return guild
 
+
 def get_host_role(guild: Guild, host_role_id: int) -> Role:
 
     host_role = guild.get_role(host_role_id)
