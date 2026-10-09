@@ -112,3 +112,37 @@ async def get_tournaments(guild_id: int, filters: TournamentFilters) -> list[Tou
     tournaments = await query
 
     return [TournamentModel(**tournament) for tournament in tournaments]
+
+
+async def update_tournament(
+    guild_id: int,
+    tournament_name: str,
+    interaction_user_id: int,
+    status: TournamentStatus,
+) -> TournamentModel:
+
+    rows = (
+        await Tournament.update(
+            {
+                Tournament.modified_by: interaction_user_id,
+                Tournament.status: status,
+            }
+        )
+        .where((Tournament.guild == guild_id) & (Tournament.name == tournament_name))
+        .returning(
+            Tournament.id,
+            Tournament.created_at,
+            Tournament.modified_at,
+            Tournament.created_by,
+            Tournament.modified_by,
+            Tournament.name,
+            Tournament.team_size,
+            Tournament.description,
+            Tournament.status,
+        )
+    )
+
+    if not rows:
+        raise MissingTournament(tournament_name=tournament_name)
+
+    return TournamentModel(**rows[0])

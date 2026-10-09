@@ -12,7 +12,11 @@ def build_tournament_embed(
         color=color,
     )
 
-    embed.add_field(name="Name", value=f"{tournament.name} • {tournament.team_size}v{tournament.team_size}", inline=False)
+    embed.add_field(
+        name="Name",
+        value=f"{tournament.name} • {tournament.team_size}v{tournament.team_size}",
+        inline=False,
+    )
 
     embed.add_field(
         name="Description",

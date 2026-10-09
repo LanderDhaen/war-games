@@ -8,7 +8,12 @@ from core.autocomplete import tournament_autocomplete
 from core.check import requires_host_role
 from core.context import get_interaction_guild
 from core.embed import build_tournament_embed
-from services.tournament import create_tournament, get_tournament, get_tournaments
+from services.tournament import (
+    create_tournament,
+    get_tournament,
+    get_tournaments,
+    update_tournament,
+)
 from data.models.tournament import TournamentFilters, TournamentStatus
 
 
@@ -132,6 +137,34 @@ class Tournament(
             title="Tournament List",
             description=embed_description,
             color=discord.Color.blue(),
+        )
+
+        await interaction.followup.send(embed=embed)
+
+    @app_commands.command(name="start", description="Start a scheduled War Games tournament")
+    @app_commands.describe(tournament_name="The name of the tournament.")
+    @app_commands.rename(tournament_name="tournament")
+    @app_commands.autocomplete(
+        tournament_name=tournament_autocomplete([TournamentStatus.SCHEDULED])
+    )
+    @app_commands.guild_only()
+    async def start_tournament(
+        self,
+        interaction: discord.Interaction,
+        tournament_name: str,
+    ) -> None:
+        await interaction.response.defer()
+
+        interaction_guild = get_interaction_guild(interaction)
+        tournament = await update_tournament(
+            interaction_guild.id, tournament_name, interaction.user.id, TournamentStatus.ACTIVE
+        )
+
+        embed = build_tournament_embed(
+            tournament,
+            title="Tournament Started",
+            description=f"The following War Games tournament has been started in **{interaction_guild.name}**:",
+            color=discord.Colour.green(),
         )
 
         await interaction.followup.send(embed=embed)
