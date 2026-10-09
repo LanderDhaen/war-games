@@ -12,7 +12,7 @@ def build_tournament_embed(
         color=color,
     )
 
-    embed.add_field(name="Name", value=tournament.name, inline=False)
+    embed.add_field(name="Name", value=f"{tournament.name} • {tournament.team_size}v{tournament.team_size}", inline=False)
 
     embed.add_field(
         name="Description",
@@ -21,11 +21,5 @@ def build_tournament_embed(
         else "*This tournament has no description.*",
         inline=False,
     )
-
-    embed.add_field(
-        name="Format", value=f"{tournament.team_size}v{tournament.team_size}", inline=False
-    )
-
-    embed.add_field(name="Status", value=tournament.status, inline=False)
 
     return embed
