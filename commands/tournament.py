@@ -174,9 +174,7 @@ class Tournament(
     @app_commands.command(name="end", description="End an active War Games tournament")
     @app_commands.describe(tournament_name="The name of the tournament.")
     @app_commands.rename(tournament_name="tournament")
-    @app_commands.autocomplete(
-        tournament_name=tournament_autocomplete([TournamentStatus.ACTIVE])
-    )
+    @app_commands.autocomplete(tournament_name=tournament_autocomplete([TournamentStatus.ACTIVE]))
     @app_commands.guild_only()
     @requires_host_role()
     async def end_tournament(
@@ -199,7 +197,6 @@ class Tournament(
         )
 
         await interaction.followup.send(embed=embed)
-
 
 
 async def setup(bot: commands.Bot) -> None:

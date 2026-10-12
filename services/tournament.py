@@ -9,7 +9,13 @@ from data.models.tournament import (
     TournamentModel,
     TournamentStatus,
 )
-from errors.tournament import DuplicateTournamentName, InvalidTournamentTeamSize, MissingActiveTournament, MissingScheduledTournament, MissingTournament
+from errors.tournament import (
+    DuplicateTournamentName,
+    InvalidTournamentTeamSize,
+    MissingActiveTournament,
+    MissingScheduledTournament,
+    MissingTournament,
+)
 
 
 async def create_tournament(
@@ -128,7 +134,11 @@ async def start_tournament(
                 Tournament.status: status,
             }
         )
-        .where((Tournament.guild == guild_id) & (Tournament.name == tournament_name) & (Tournament.status == TournamentStatus.SCHEDULED))
+        .where(
+            (Tournament.guild == guild_id)
+            & (Tournament.name == tournament_name)
+            & (Tournament.status == TournamentStatus.SCHEDULED)
+        )
         .returning(
             Tournament.id,
             Tournament.created_at,
@@ -147,6 +157,7 @@ async def start_tournament(
 
     return TournamentModel(**rows[0])
 
+
 async def end_tournament(
     guild_id: int,
     tournament_name: str,
@@ -161,7 +172,11 @@ async def end_tournament(
                 Tournament.status: status,
             }
         )
-        .where((Tournament.guild == guild_id) & (Tournament.name == tournament_name) & (Tournament.status == TournamentStatus.ACTIVE))
+        .where(
+            (Tournament.guild == guild_id)
+            & (Tournament.name == tournament_name)
+            & (Tournament.status == TournamentStatus.ACTIVE)
+        )
         .returning(
             Tournament.id,
             Tournament.created_at,
