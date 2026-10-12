@@ -9,7 +9,7 @@ from data.models.tournament import (
     TournamentModel,
     TournamentStatus,
 )
-from errors.tournament import DuplicateTournamentName, InvalidTournamentTeamSize, MissingActiveTournament, MissingTournament
+from errors.tournament import DuplicateTournamentName, InvalidTournamentTeamSize, MissingActiveTournament, MissingScheduledTournament, MissingTournament
 
 
 async def create_tournament(
@@ -129,6 +129,39 @@ async def start_tournament(
             }
         )
         .where((Tournament.guild == guild_id) & (Tournament.name == tournament_name) & (Tournament.status == TournamentStatus.SCHEDULED))
+        .returning(
+            Tournament.id,
+            Tournament.created_at,
+            Tournament.modified_at,
+            Tournament.created_by,
+            Tournament.modified_by,
+            Tournament.name,
+            Tournament.team_size,
+            Tournament.description,
+            Tournament.status,
+        )
+    )
+
+    if not rows:
+        raise MissingScheduledTournament(tournament_name=tournament_name)
+
+    return TournamentModel(**rows[0])
+
+async def end_tournament(
+    guild_id: int,
+    tournament_name: str,
+    interaction_user_id: int,
+    status: TournamentStatus,
+) -> TournamentModel:
+
+    rows = (
+        await Tournament.update(
+            {
+                Tournament.modified_by: interaction_user_id,
+                Tournament.status: status,
+            }
+        )
+        .where((Tournament.guild == guild_id) & (Tournament.name == tournament_name) & (Tournament.status == TournamentStatus.ACTIVE))
         .returning(
             Tournament.id,
             Tournament.created_at,

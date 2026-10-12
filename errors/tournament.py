@@ -32,6 +32,17 @@ class MissingTournament(ExpectedError):
         )
         super().__init__()
 
+class MissingScheduledTournament(ExpectedError):
+    """Raised when a tournament can't be found in the current server."""
+
+    title = "Missing Tournament"
+
+    def __init__(self, tournament_name: str):
+        self.description = (
+            f"There's no scheduled tournament with the name `{tournament_name}` in this server."
+        )
+        super().__init__()
+
 class MissingActiveTournament(ExpectedError):
     """Raised when a tournament can't be found in the current server."""
 

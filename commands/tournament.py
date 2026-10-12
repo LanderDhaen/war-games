@@ -10,6 +10,7 @@ from core.context import get_interaction_guild
 from core.embed import build_tournament_embed
 from services.tournament import (
     create_tournament,
+    end_tournament,
     get_tournament,
     get_tournaments,
     start_tournament,
@@ -168,6 +169,35 @@ class Tournament(
         )
 
         await interaction.followup.send(embed=embed)
+
+    @app_commands.command(name="end", description="End an active War Games tournament")
+    @app_commands.describe(tournament_name="The name of the tournament.")
+    @app_commands.rename(tournament_name="tournament")
+    @app_commands.autocomplete(
+        tournament_name=tournament_autocomplete([TournamentStatus.ACTIVE])
+    )
+    @app_commands.guild_only()
+    async def end_tournament(
+        self,
+        interaction: discord.Interaction,
+        tournament_name: str,
+    ) -> None:
+        await interaction.response.defer()
+
+        interaction_guild = get_interaction_guild(interaction)
+        tournament = await end_tournament(
+            interaction_guild.id, tournament_name, interaction.user.id, TournamentStatus.FINISHED
+        )
+
+        embed = build_tournament_embed(
+            tournament,
+            title="Tournament Ended",
+            description=f"The following War Games tournament has been ended in **{interaction_guild.name}**:",
+            color=discord.Colour.green(),
+        )
+
+        await interaction.followup.send(embed=embed)
+
 
 
 async def setup(bot: commands.Bot) -> None:
