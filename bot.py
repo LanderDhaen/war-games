@@ -20,6 +20,7 @@ class WarGamesBot(commands.Bot):
 
     async def setup_hook(self) -> None:
         await self.load_extension("commands.configuration")
+        await self.load_extension("commands.tournament")
 
 
 class WarGamesCommandTree(app_commands.CommandTree):
@@ -53,15 +54,13 @@ class WarGamesCommandTree(app_commands.CommandTree):
                     f"Something went wrong while executing `/{interaction.command.qualified_name}`."
                 )
 
-                logger.error(description, exc_info=error.original)
-
             case _:
                 title = "What happened here?"
                 description = (
                     f"Something went wrong while executing `/{interaction.command.qualified_name}`."
                 )
 
-                logger.error(description, exc_info=error)
+        logger.error(description, exc_info=error)
 
         embed = discord.Embed(
             title=title,
