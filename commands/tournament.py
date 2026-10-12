@@ -149,6 +149,7 @@ class Tournament(
         tournament_name=tournament_autocomplete([TournamentStatus.SCHEDULED])
     )
     @app_commands.guild_only()
+    @requires_host_role()
     async def start_tournament(
         self,
         interaction: discord.Interaction,
@@ -177,6 +178,7 @@ class Tournament(
         tournament_name=tournament_autocomplete([TournamentStatus.ACTIVE])
     )
     @app_commands.guild_only()
+    @requires_host_role()
     async def end_tournament(
         self,
         interaction: discord.Interaction,
