@@ -9,7 +9,7 @@ from data.models.tournament import (
     TournamentModel,
     TournamentStatus,
 )
-from errors.tournament import DuplicateTournamentName, InvalidTournamentTeamSize, MissingTournament
+from errors.tournament import DuplicateTournamentName, InvalidTournamentTeamSize, MissingActiveTournament, MissingTournament
 
 
 async def create_tournament(
@@ -114,7 +114,7 @@ async def get_tournaments(guild_id: int, filters: TournamentFilters) -> list[Tou
     return [TournamentModel(**tournament) for tournament in tournaments]
 
 
-async def update_tournament(
+async def start_tournament(
     guild_id: int,
     tournament_name: str,
     interaction_user_id: int,
@@ -128,7 +128,7 @@ async def update_tournament(
                 Tournament.status: status,
             }
         )
-        .where((Tournament.guild == guild_id) & (Tournament.name == tournament_name))
+        .where((Tournament.guild == guild_id) & (Tournament.name == tournament_name) & (Tournament.status == TournamentStatus.SCHEDULED))
         .returning(
             Tournament.id,
             Tournament.created_at,
@@ -143,6 +143,6 @@ async def update_tournament(
     )
 
     if not rows:
-        raise MissingTournament(tournament_name=tournament_name)
+        raise MissingActiveTournament(tournament_name=tournament_name)
 
     return TournamentModel(**rows[0])

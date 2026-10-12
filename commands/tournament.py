@@ -12,7 +12,7 @@ from services.tournament import (
     create_tournament,
     get_tournament,
     get_tournaments,
-    update_tournament,
+    start_tournament,
 )
 from data.models.tournament import TournamentFilters, TournamentStatus
 
@@ -156,7 +156,7 @@ class Tournament(
         await interaction.response.defer()
 
         interaction_guild = get_interaction_guild(interaction)
-        tournament = await update_tournament(
+        tournament = await start_tournament(
             interaction_guild.id, tournament_name, interaction.user.id, TournamentStatus.ACTIVE
         )
 
